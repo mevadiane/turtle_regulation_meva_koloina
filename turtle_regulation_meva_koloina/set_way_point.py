@@ -10,14 +10,17 @@ class SetWayPoint(Node):
         self.pose = None
         self.waypoint = [7.0, 7.0]
         self.Kp = 3.0
+        self.Kpl = 1.0
         self.pose_subscriber = self.create_subscription(Pose, "/turtle1/pose", self.pose_callback, 10)
         self.cmd_vel_publisher = self.create_publisher(Twist, "/turtle1/cmd_vel", 10)
-        self.timer = self.create_timer(0.1, self.calcul_angle_desire)
+        # Partie 2, exercice 4
+        self.is_moving_publisher = self.create_publisher(Bool, "/turtle1/is_moving", self.pose_callback, 10)
+        self.timer = self.create_timer(0.1, self.calculs)
 
     def pose_callback(self, msg):
         self.pose = msg
 
-    def calcul_angle_desire(self):
+    def calculs(self):
         if self.pose is None:
             return
 
@@ -35,8 +38,26 @@ class SetWayPoint(Node):
         u = self.Kp * e
         msg = Twist()
         msg.angular.z = u
-        self.cmd_vel_publisher.publish(msg)
+        # self.cmd_vel_publisher.publish(msg)
 
+        # Partie 2, exercice 1
+        e1 = math.sqrt((self.waypoint[1] - self.pose.y)**2 + (self.waypoint[0] - self.pose.x)**2)
+
+        # Partie 2, exercice 2
+        v = self.Kpl * e1
+
+        # Partie 2, exercice 3 + exercice 4
+        distance_tolerance = 0.5
+        # msg.angular.z = u
+        msg.linear.x = v
+        if e1 > distance_tolerance:
+            self.is_moving_publisher.publish(True) 
+            self.cmd_vel_publisher.publish(msg)
+        else:
+            self.cmd_vel_publisher = False
+            self.is_moving_publisher.publish(False)
+        
+        
 
 def main(args=None):
 	rclpy.init(args=args)
