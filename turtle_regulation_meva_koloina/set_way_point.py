@@ -10,8 +10,8 @@ class SetWayPoint(Node):
         super().__init__('set_way_point')
         self.pose = None
         self.waypoint = [7.0, 7.0]
-        self.Kp = 2.0
-        self.Kpl = 3.0
+        self.Kp = 5.0
+        self.Kpl = 0.2
         self.pose_subscriber = self.create_subscription(Pose, "/turtle1/pose", self.pose_callback, 10)
         self.cmd_vel_publisher = self.create_publisher(Twist, "/turtle1/cmd_vel", 10)
         # Partie 2, exercice 4
