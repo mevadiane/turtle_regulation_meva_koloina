@@ -9,7 +9,7 @@ class SetWayPoint(Node):
         super().__init__('set_way_point')
         self.pose = None
         self.waypoint = [7.0, 7.0]
-        self.Kp = 2.0
+        self.Kp = 3.0
         self.pose_subscriber = self.create_subscription(Pose, "/turtle1/pose", self.pose_callback, 10)
         self.cmd_vel_publisher = self.create_publisher(Twist, "/turtle1/cmd_vel", 10)
         self.timer = self.create_timer(0.1, self.calcul_angle_desire)
@@ -23,8 +23,8 @@ class SetWayPoint(Node):
 
         # Partie 1, exercice 4
         theta_desired=math.atan2(
-            self.waypoint['y'] - self.pose.y,
-            self.waypoint['x'] - self.pose.x
+            self.waypoint[1] - self.pose.y,
+            self.waypoint[0] - self.pose.x
         )
 
         # Partie 1, exercice 5
