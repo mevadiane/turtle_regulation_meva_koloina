@@ -24,6 +24,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
+            "set_way_point=turtle_regulation_meva_koloina.set_way_point:main"
         ],
     },
 )
