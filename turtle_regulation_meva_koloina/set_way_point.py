@@ -2,6 +2,7 @@ import rclpy
 from rclpy.node import Node
 from turtlesim.msg import Pose
 from geometry_msgs.msg import Twist
+from std_msgs.msg import Bool
 import math
 
 class SetWayPoint(Node):
@@ -9,12 +10,12 @@ class SetWayPoint(Node):
         super().__init__('set_way_point')
         self.pose = None
         self.waypoint = [7.0, 7.0]
-        self.Kp = 3.0
-        self.Kpl = 1.0
+        self.Kp = 2.0
+        self.Kpl = 3.0
         self.pose_subscriber = self.create_subscription(Pose, "/turtle1/pose", self.pose_callback, 10)
         self.cmd_vel_publisher = self.create_publisher(Twist, "/turtle1/cmd_vel", 10)
         # Partie 2, exercice 4
-        self.is_moving_publisher = self.create_publisher(Bool, "/turtle1/is_moving", self.pose_callback, 10)
+        self.is_moving_publisher = self.create_publisher(Bool, "/is_moving", 10)
         self.timer = self.create_timer(0.1, self.calculs)
 
     def pose_callback(self, msg):
@@ -38,7 +39,6 @@ class SetWayPoint(Node):
         u = self.Kp * e
         msg = Twist()
         msg.angular.z = u
-        # self.cmd_vel_publisher.publish(msg)
 
         # Partie 2, exercice 1
         e1 = math.sqrt((self.waypoint[1] - self.pose.y)**2 + (self.waypoint[0] - self.pose.x)**2)
@@ -48,14 +48,15 @@ class SetWayPoint(Node):
 
         # Partie 2, exercice 3 + exercice 4
         distance_tolerance = 0.5
-        # msg.angular.z = u
         msg.linear.x = v
+        msg_moving = Bool()
         if e1 > distance_tolerance:
-            self.is_moving_publisher.publish(True) 
-            self.cmd_vel_publisher.publish(msg)
+            msg_moving.data = True
         else:
-            self.cmd_vel_publisher = False
-            self.is_moving_publisher.publish(False)
+            msg = Twist()
+            msg_moving.data = False
+        self.cmd_vel_publisher.publish(msg)
+        self.is_moving_publisher.publish(msg_moving) 
         
         
 
